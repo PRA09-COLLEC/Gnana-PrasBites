@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Food | Gnana PrasBites</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            margin: 0;
+            background: #fffaf3;
+            color: #342b2b;
+            font-family: Arial, sans-serif;
+        }
+
+        nav {
+            background: #641e2b;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav h2 {
+            color: white;
+            margin: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #762536, #b84b40);
+            color: white;
+            padding: 40px 7%;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin: 0 0 12px;
+        }
+
+        .hero p {
+            margin-bottom: 0;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 25px rgba(60, 30, 20, 0.09);
+        }
+
+        .container h2 {
+            color: #641e2b;
+            margin-top: 0;
+            margin-bottom: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px;
+            border: 1px solid #ded6d0;
+            border-radius: 9px;
+            background: #fffdfb;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #d99b75;
+            border-color: #a94742;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        button, .menu-link {
+            display: inline-block;
+            border: none;
+            border-radius: 9px;
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .save-btn {
+            background: #8b2635;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #641e2b;
+        }
+
+        .secondary-btn, .menu-link {
+            background: #fff;
+            color: #641e2b;
+            border: 1px solid #dfd0ca;
+        }
+
+        .secondary-btn:hover, .menu-link:hover {
+            background: #f8eee8;
+        }
+
+        .message {
+            display: none;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            display: block;
+            color: #155724;
+            background: #e5f5e8;
+        }
+
+        .error {
+            display: block;
+            color: #842029;
+            background: #f8dfe2;
+        }
+
+        footer {
+            text-align: center;
+            background: #641e2b;
+            color: white;
+            padding: 22px;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width, .form-buttons {
+                grid-column: 1;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .container {
+                margin: 20px 12px;
+                padding: 22px;
+            }
+
+            nav a {
+                margin-left: 0;
+                margin-right: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <h2>🍽️ Gnana PrasBites</h2>
+
+        <div>
+            <a href="index.html">Home</a>
+            <a href="insert.html">Add Food</a>
+            <a href="list.html">Food Menu</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Add a Delicious Food Item</h1>
+        <p>Enter the food details and save them to your collection.</p>
+    </header>
+
+    <main class="container">
+
+        <h2>Food Information</h2>
+
+        <div id="message" class="message" role="status"
+             aria-live="polite"></div>
+
+        <form id="insertForm">
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="food_name">Food Name *</label>
+                    <input
+                        type="text"
+                        id="food_name"
+                        name="food_name"
+                        placeholder="Enter food name"
+                        maxlength="45"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label for="category">Food Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select category</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Pizza">Pizza</option>
+                        <option value="Burger">Burger</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="price">Price (₹) *</label>
+                    <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        placeholder="Enter price"
+                        min="0.01"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label for="availability">Availability *</label>
+                    <select id="availability" name="availability" required>
+                        <option value="1">Available</option>
+                        <option value="0">Not Available</option>
+                    </select>
+                </div>
+
+                <div class="field full-width">
+                    <label for="description">Food Description *</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe the food item..."
+                        required></textarea>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" id="saveButton"
+                            class="save-btn">
+                        ➕ Save Food Item
+                    </button>
+
+                    <button type="reset" class="secondary-btn">
+                        Clear Form
+                    </button>
+
+                    <a href="list.html" class="menu-link">
+                        View Food Menu
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Gnana PrasBites | Delicious Food, Happy Moments ❤️</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById("insertForm");
+        const message = document.getElementById("message");
+        const saveButton = document.getElementById("saveButton");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+
+            message.className = "message";
+            message.textContent = "";
+
+            const data = {
+                food_name: document.getElementById("food_name").value.trim(),
+                category: document.getElementById("category").value,
+                price: Number(document.getElementById("price").value),
+                description: document.getElementById("description").value.trim(),
+                availability: Number(
+                    document.getElementById("availability").value
+                )
+            };
+
+            try {
+                const response = await fetch("/food", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const responseText = await response.text();
+
+                let result;
+
+                try {
+                    result = JSON.parse(responseText);
+                } catch {
+                    throw new Error(
+                        "The server did not return JSON. Check your POST /food route."
+                    );
+                }
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        result.error || result.message || "Food insertion failed."
+                    );
+                }
+
+                message.className = "message success";
+                message.textContent =
+                    "✅ Food inserted successfully! " +
+                    (result.food_id || result.id
+                        ? "Food ID: " + (result.food_id || result.id)
+                        : "");
+
+                form.reset();
+
+            } catch (error) {
+                message.className = "message error";
+                message.textContent =
+                    "❌ Insertion failed: " + error.message;
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = "➕ Save Food Item";
+            }
+        });
+
+        form.addEventListener("reset", function() {
+            message.className = "message";
+            message.textContent = "";
+        });
+    </script>
+
+</body>
+</html>

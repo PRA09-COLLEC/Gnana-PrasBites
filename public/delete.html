@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Food | Gnana PrasBites</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fffaf3;
+            color: #342b2b;
+        }
+
+        nav {
+            background: #641e2b;
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        header {
+            background: linear-gradient(120deg, #762536, #b84b40);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 28px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px #00000012;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 13px 18px;
+            margin: 12px 6px 0 0;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .search-btn {
+            background: #8b2635;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #c62828;
+            color: white;
+        }
+
+        .delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: #eee4dc;
+            color: #641e2b;
+        }
+
+        .food-details {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #fff6ef;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        #message {
+            margin-top: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        footer {
+            margin-top: 45px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            background: #641e2b;
+        }
+
+        @media (max-width: 650px) {
+            .container {
+                margin: 20px 12px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <strong>🍽️ Gnana PrasBites</strong>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="insert.html">Add Food</a>
+        <a href="list.html">Food Menu</a>
+        <a href="update.html">Update Food</a>
+    </div>
+</nav>
+
+<header>
+    <h1>🗑️ Delete Food Item</h1>
+    <p>Find the food item before deleting it.</p>
+</header>
+
+<main class="container">
+
+    <form id="searchForm">
+        <label for="food_id">Food ID *</label>
+        <input type="number" id="food_id" min="1"
+               placeholder="Enter food ID" required>
+
+        <button type="submit" class="search-btn">
+            🔍 Find Food
+        </button>
+    </form>
+
+    <section id="foodDetails" class="food-details">
+        <h2>Food Details</h2>
+        <p><strong>ID:</strong> <span id="detailId"></span></p>
+        <p><strong>Name:</strong> <span id="detailName"></span></p>
+        <p><strong>Category:</strong> <span id="detailCategory"></span></p>
+        <p><strong>Price:</strong> ₹<span id="detailPrice"></span></p>
+        <p><strong>Description:</strong> <span id="detailDescription"></span></p>
+        <p><strong>Availability:</strong> <span id="detailAvailability"></span></p>
+
+        <button type="button" id="deleteButton" class="delete-btn">
+            🗑️ Confirm Delete
+        </button>
+
+        <button type="button" id="cancelButton" class="secondary-btn">
+            Cancel
+        </button>
+    </section>
+
+    <p id="message" role="status" aria-live="polite"></p>
+
+</main>
+
+<footer>
+    © 2026 Gnana PrasBites | Delicious Food, Happy Moments!
+</footer>
+
+<script>
+    const foodIdInput = document.getElementById("food_id");
+    const searchForm = document.getElementById("searchForm");
+    const foodDetails = document.getElementById("foodDetails");
+    const message = document.getElementById("message");
+    const deleteButton = document.getElementById("deleteButton");
+
+    let selectedFood = null;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get("id");
+
+    if (urlId && /^\d+$/.test(urlId) && Number(urlId) > 0) {
+        foodIdInput.value = urlId;
+        loadFood();
+    }
+
+    async function loadFood() {
+        const id = foodIdInput.value.trim();
+
+        if (!/^\d+$/.test(id) || Number(id) <= 0) {
+            message.textContent = "Please enter a valid Food ID.";
+            return;
+        }
+
+        foodDetails.style.display = "none";
+        selectedFood = null;
+        message.textContent = "Searching for food...";
+
+        try {
+            const response = await fetch("/food/" + encodeURIComponent(id));
+            const food = await response.json();
+
+            if (!response.ok) {
+                throw new Error(food.error || food.message || "Food not found.");
+            }
+
+            selectedFood = food;
+
+            document.getElementById("detailId").textContent = food.food_id;
+            document.getElementById("detailName").textContent = food.food_name || "";
+            document.getElementById("detailCategory").textContent = food.category || "";
+            document.getElementById("detailPrice").textContent = food.price ?? "";
+            document.getElementById("detailDescription").textContent =
+                food.description || "-";
+
+            document.getElementById("detailAvailability").textContent =
+                Number(food.availability) === 1
+                    ? "Available"
+                    : "Not Available";
+
+            foodDetails.style.display = "block";
+            message.textContent = "Food item found. Review the details before deleting.";
+        } catch (error) {
+            message.textContent = "❌ " + error.message;
+        }
+    }
+
+    searchForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        loadFood();
+    });
+
+    document.getElementById("cancelButton").addEventListener("click", () => {
+        selectedFood = null;
+        foodDetails.style.display = "none";
+        message.textContent = "Deletion cancelled.";
+    });
+
+    deleteButton.addEventListener("click", async () => {
+        if (!selectedFood) {
+            message.textContent = "Find a food item first.";
+            return;
+        }
+
+        const confirmed = confirm(
+            `Delete "${selectedFood.food_name}" (ID ${selectedFood.food_id})?`
+        );
+
+        if (!confirmed) return;
+
+        deleteButton.disabled = true;
+        deleteButton.textContent = "Deleting...";
+
+        try {
+            const response = await fetch(
+                "/food/" + encodeURIComponent(selectedFood.food_id),
+                {method: "DELETE"}
+            );
+
+            if (!response.ok) {
+                const text = await response.text();
+                let errorMsg = "Delete failed.";
+                try {
+                    const result = JSON.parse(text);
+                    errorMsg = result.error || result.message || errorMsg;
+                } catch {}
+                throw new Error(errorMsg);
+            }
+
+            foodDetails.style.display = "none";
+            selectedFood = null;
+            foodIdInput.value = "";
+            message.textContent = "✅ Food item deleted successfully!";
+
+        } catch (error) {
+            message.textContent = "❌ Delete failed: " + error.message;
+        } finally {
+            deleteButton.disabled = false;
+            deleteButton.textContent = "🗑️ Confirm Delete";
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Food | Gnana PrasBites</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fffaf3;
+            color: #342b2b;
+        }
+
+        nav {
+            background: #641e2b;
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        header {
+            background: linear-gradient(120deg, #762536, #b84b40);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 35px auto;
+            padding: 28px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px #00000012;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+        }
+
+        button {
+            padding: 13px 20px;
+            margin-top: 22px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .update-btn {
+            background: #8b2635;
+            color: white;
+        }
+
+        .secondary-btn {
+            background: #eee4dc;
+            color: #641e2b;
+            margin-left: 8px;
+        }
+
+        #message {
+            margin-top: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            background: #641e2b;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                margin: 20px 12px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <strong>🍽️ Gnana PrasBites</strong>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="insert.html">Add Food</a>
+        <a href="list.html">Food Menu</a>
+        <a href="delete.html">Delete Food</a>
+    </div>
+</nav>
+
+<header>
+    <h1>✏️ Update Food Item</h1>
+    <p>Change the details of your food item.</p>
+</header>
+
+<main class="container">
+
+    <form id="updateForm">
+        <label for="food_id">Food ID *</label>
+        <input type="number" id="food_id" min="1" required>
+
+        <button type="button" id="loadBtn" class="secondary-btn">
+            Load Food Details
+        </button>
+
+        <label for="food_name">Food Name *</label>
+        <input type="text" id="food_name" required>
+
+        <label for="category">Category *</label>
+        <select id="category" required>
+            <option value="">Select category</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Pizza">Pizza</option>
+            <option value="Burger">Burger</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Beverages">Beverages</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label for="price">Price (₹) *</label>
+        <input type="number" id="price" min="0.01" step="0.01" required>
+
+        <label for="description">Description *</label>
+        <textarea id="description" required></textarea>
+
+        <label for="availability">Availability *</label>
+        <select id="availability" required>
+            <option value="1">Available</option>
+            <option value="0">Not Available</option>
+        </select>
+
+        <button type="submit" class="update-btn">
+            💾 Save Changes
+        </button>
+
+        <button type="reset" class="secondary-btn">
+            Clear Form
+        </button>
+    </form>
+
+    <p id="message" role="status" aria-live="polite"></p>
+
+</main>
+
+<footer>
+    © 2026 Gnana PrasBites | Delicious Food, Happy Moments!
+</footer>
+
+<script>
+    const form = document.getElementById("updateForm");
+    const message = document.getElementById("message");
+    const foodIdInput = document.getElementById("food_id");
+
+    // Read the food ID from the URL, e.g. update.html?id=3
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get("id");
+
+    if (urlId && /^\d+$/.test(urlId) && Number(urlId) > 0) {
+        foodIdInput.value = urlId;
+        loadFood();
+    }
+
+    async function loadFood() {
+        const id = foodIdInput.value.trim();
+
+        if (!/^\d+$/.test(id) || Number(id) <= 0) {
+            message.textContent = "Please enter a valid Food ID.";
+            return;
+        }
+
+        message.textContent = "Loading food details...";
+
+        try {
+            const response = await fetch("/food/" + encodeURIComponent(id));
+            const food = await response.json();
+
+            if (!response.ok) {
+                throw new Error(food.error || food.message || "Food not found.");
+            }
+
+            document.getElementById("food_name").value = food.food_name || "";
+            document.getElementById("category").value = food.category || "";
+            document.getElementById("price").value = food.price ?? "";
+            document.getElementById("description").value = food.description || "";
+            document.getElementById("availability").value =
+                String(food.availability ?? 1);
+
+            message.textContent = "Food details loaded successfully.";
+        } catch (error) {
+            message.textContent = "Unable to load food: " + error.message;
+        }
+    }
+
+    document.getElementById("loadBtn").addEventListener("click", loadFood);
+
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const id = foodIdInput.value.trim();
+
+        if (!/^\d+$/.test(id) || Number(id) <= 0) {
+            message.textContent = "Please enter a valid Food ID.";
+            return;
+        }
+
+        const data = {
+            food_name: document.getElementById("food_name").value.trim(),
+            category: document.getElementById("category").value,
+            price: Number(document.getElementById("price").value),
+            description: document.getElementById("description").value.trim(),
+            availability: Number(document.getElementById("availability").value)
+        };
+
+        message.textContent = "Updating food...";
+
+        try {
+            const response = await fetch("/food/" + encodeURIComponent(id), {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+
+            const text = await response.text();
+            let result = {};
+
+            try {
+                result = text ? JSON.parse(text) : {};
+            } catch {
+                if (response.ok) {
+                    message.textContent = "✅ Food updated successfully!";
+                    return;
+                }
+                throw new Error("Server returned an unexpected response.");
+            }
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.error || result.message || "Update failed.");
+            }
+
+            message.textContent =
+                "✅ Food updated successfully! " +
+                (result.message || "");
+        } catch (error) {
+            message.textContent = "❌ Update failed: " + error.message;
+        }
+    });
+</script>
+
+</body>
+</html>
